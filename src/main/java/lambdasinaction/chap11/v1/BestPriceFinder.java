@@ -3,14 +3,7 @@ package lambdasinaction.chap11.v1;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -71,7 +64,7 @@ public class BestPriceFinder {
                 .thenCombine(
                     CompletableFuture.supplyAsync(
                         () ->  ExchangeService.getRate(Money.EUR, Money.USD)),
-                    (price, rate) -> price * rate
+                    this::getPrice
                 );
             priceFutures.add(futurePriceInUSD);
         }
@@ -83,6 +76,10 @@ public class BestPriceFinder {
                 .map(price -> /*shop.getName() +*/ " price is " + price)
                 .collect(Collectors.toList());
         return prices;
+    }
+
+    public double getPrice(double price, double rate) {
+        return price * rate;
     }
 
     public List<String> findPricesInUSDJava7(String product) {
